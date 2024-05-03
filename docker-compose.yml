@@ -1,0 +1,22 @@
+version: "3.1"
+
+services:
+  firebase-emulator:
+    container_name: firebase-emulator
+    build:
+      context: ./firebase-docker
+      dockerfile: Dockerfile
+      args:
+        FIREBASE_TOOLS_VERSION: "11.16.0"
+    ports:
+      - 8080:8080 # firestore
+      - 9199:9199 # storage
+      - 5001:5001 # functions
+      - 9099:9099 # auth
+      - 4000:4000 # ui
+      - 8085:8085 # pubsub
+    environment:
+      FIREBASE_PROJECT_ID: "test-project"
+      EMULATORS_USED: "pubsub,firestore,functions,storage,auth"
+    volumes:
+      - ./firebase-docker/cache:/root/.cache:rw

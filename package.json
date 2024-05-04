@@ -27,7 +27,7 @@
   "dependencies": {
     "@google-cloud/functions-framework": "^3.4.0",
     "@google-cloud/pubsub": "^4.3.3",
-    "firebase-admin": "^12.1.0",
+    "protobufjs": "^7.2.6",
     "ts-retry-promise": "^0.8.0"
   }
 }

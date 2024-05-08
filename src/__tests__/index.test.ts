@@ -42,8 +42,8 @@ describe("dataWritten", async () => {
       value: Document.create({
         name: "users/123/feed/1",
         fields: {
-          name: { stringValue: "Feed new" },
-          email: { stringValue: "some new data" },
+          title: { stringValue: "Feed new" },
+          description: { stringValue: "some new data" },
         },
       }),
     });
@@ -52,6 +52,10 @@ describe("dataWritten", async () => {
       type: "google.cloud.firestore.document.v1.updated",
       data: DocumentEventData.encode(data).finish(),
     });
+    const expectedFirestoreData = {
+      title: "Feed new",
+      description: "some new data",
+    };
 
     await dataStream.userWritten(cloudEvent);
 
@@ -61,6 +65,7 @@ describe("dataWritten", async () => {
     expect(message.data.originator).toBe("data-stream");
     expect(message.data.correlationId).toBe(cloudEvent.id);
     expect(message.data.payload.updateType).toBe("update");
+    expect(message.data.payload.value).toStrictEqual(expectedFirestoreData);
     expect(message.data.payload.subject).toBe("users/123/feed/1");
     expect(message.data.originator).toBe("data-stream");
     expect(message.attributes.messageType).toBe("UserDocumentWritten");

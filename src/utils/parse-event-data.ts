@@ -1,6 +1,7 @@
 import { CloudEvent } from "@google-cloud/functions-framework";
 import { load, Reader } from "protobufjs";
 import path from "path";
+import { serializeData } from "./serialize-data";
 
 export type ParsedEvent = {
   id: string;
@@ -24,6 +25,18 @@ export const parseEventData = async (
 
   const collectionPath = firestoreReceived.value.name.split("/").slice(0, -1).join("/");
   const eventType = getEventType(cloudEvent.type);
+
+  let data =
+    eventType === "delete" ? firestoreReceived.oldValue.fields : firestoreReceived.value.fields;
+  data = serializeData(data);
+
+  return {
+    id: cloudEvent.id,
+    data: data,
+    subject: firestoreReceived.value.name,
+    collectionPath: collectionPath,
+    type: eventType,
+  };
 
   return {
     id: cloudEvent.id,

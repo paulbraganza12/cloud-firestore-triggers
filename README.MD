@@ -2,6 +2,8 @@
 
 In this project, we are publishing `user-written` topic with the following message when on `onDocumentWritten` event is triggered
 
+![alt text](https://github.com/paulbraganza12/cloud-firestore-triggers/assets/25667662/935b8ac7-73fc-4af6-b1f5-85d83854c6a8)
+
 ```
 {
     json: {

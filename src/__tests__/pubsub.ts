@@ -45,9 +45,17 @@ export const setUpSubscription = async (
   messages: CapturedMessage[];
   subscription: Subscription;
 }> => {
-  const subscriptionName = `${topic}-${Math.floor(Math.random() * 10000)}`;
-  const [subscription] = await pubsub.topic(topic).createSubscription(subscriptionName);
-  subscriptions.push(subscription);
+  const existingSubscriptions = subscriptions.filter((sub) => {
+    return sub.name.includes(topic);
+  });
+
+  let subscription: Subscription;
+  if (existingSubscriptions.length === 0) {
+    [subscription] = await pubsub.topic(topic).createSubscription(topic);
+    subscriptions.push(subscription);
+  } else {
+    subscription = existingSubscriptions[0];
+  }
 
   const messages: CapturedMessage[] = [];
   subscription.on("message", (message) => {

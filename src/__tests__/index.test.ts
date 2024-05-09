@@ -1,8 +1,14 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { CloudEvent } from "cloudevents";
 import * as dataStream from "../index";
 import * as protobuf from "protobufjs";
-import { CapturedMessage, createRequiredTopics, setUpSubscription, waitForMessage } from "./pubsub";
+import {
+  CapturedMessage,
+  createRequiredTopics,
+  setUpSubscription,
+  tearDownPubSub,
+  waitForMessage,
+} from "./pubsub";
 import { Subscription } from "@google-cloud/pubsub";
 import { USER_STREAM } from "../config";
 import path from "path";
@@ -11,6 +17,10 @@ const dataProtoPath = path.join(__dirname, "../data.proto");
 
 beforeAll(async () => {
   await createRequiredTopics();
+});
+
+afterAll(async () => {
+  await tearDownPubSub();
 });
 
 describe("dataWritten", async () => {

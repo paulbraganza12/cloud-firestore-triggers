@@ -60,7 +60,7 @@ export const setUpSubscription = async (
   const messages: CapturedMessage[] = [];
   subscription.on("message", (message) => {
     const attributes = message.attributes;
-    const decodedMessage = JSON.parse(Buffer.from(message.data, "base64").toString("utf-8"));
+    const decodedMessage = JSON.parse(message.data as any);
     messages.push({
       data: decodedMessage,
       attributes,

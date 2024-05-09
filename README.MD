@@ -30,7 +30,9 @@ Example:
     originator: "data-stream",
     payload: {
       updateType: 'update',
-      value: [Object],
+      value: {
+				title: "new title",
+			},
       subject: 'user/123/feed/1'
     }
   },
@@ -62,8 +64,7 @@ cp .env.example .env
 2. Install NodeJS18
 
 ```
-nvm install 18
-nvm use 18
+nvm use
 ```
 
 ### Install App

@@ -33,14 +33,14 @@ describe("dataWritten", async () => {
     const Document = root.lookupType("google.events.cloud.firestore.v1.Document");
     const data = DocumentEventData.create({
       oldValue: Document.create({
-        name: "users/123/feed/1",
+        name: "users/123/feeds/1",
         fields: {
           title: { stringValue: "Feed Old" },
           description: { stringValue: "some old data" },
         },
       }),
       value: Document.create({
-        name: "users/123/feed/1",
+        name: "users/123/feeds/1",
         fields: {
           title: { stringValue: "Feed new" },
           description: { stringValue: "some new data" },
@@ -49,7 +49,7 @@ describe("dataWritten", async () => {
     });
     const cloudEvent = new CloudEvent({
       source: "firebase",
-      type: "google.cloud.firestore.document.v1.updated",
+      type: "google.cloud.firestore.document.v1.written",
       data: DocumentEventData.encode(data).finish(),
     });
     const expectedFirestoreData = {
@@ -66,10 +66,10 @@ describe("dataWritten", async () => {
     expect(message.data.correlationId).toBe(cloudEvent.id);
     expect(message.data.payload.updateType).toBe("update");
     expect(message.data.payload.value).toStrictEqual(expectedFirestoreData);
-    expect(message.data.payload.subject).toBe("users/123/feed/1");
+    expect(message.data.payload.subject).toBe("users/123/feeds/1");
     expect(message.data.originator).toBe("data-stream");
     expect(message.attributes.messageType).toBe("UserDocumentWritten");
     expect(message.attributes.messageVersion).toBe("1");
-    expect(message.attributes.collectionPath).toBe("users/123/feed");
+    expect(message.attributes.collectionPath).toBe("users:feeds");
   });
 });

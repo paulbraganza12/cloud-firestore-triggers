@@ -2,6 +2,7 @@ import { CloudEvent } from "@google-cloud/functions-framework";
 import { load, Reader } from "protobufjs";
 import path from "path";
 import { serializeData } from "./serialize-data";
+import { EventType } from "../config";
 
 export type ParsedEvent = {
   id: string;
@@ -23,41 +24,40 @@ export const parseEventData = async (
   }
   const firestoreReceived = DocumentEventData.decode(cloudEvent.data).toJSON();
 
-  const collectionPath = firestoreReceived.value.name.split("/").slice(0, -1).join("/");
-  const eventType = getEventType(cloudEvent.type);
+  const eventType = getEventType(firestoreReceived);
 
-  let data =
-    eventType === "delete" ? firestoreReceived.oldValue.fields : firestoreReceived.value.fields;
-  data = serializeData(data);
+  const value = eventType === "delete" ? firestoreReceived.oldValue : firestoreReceived.value;
+  const collectionPath = createCollectionPath(value.name);
+  const subject = value.name;
+  const data = serializeData(value.fields);
 
   return {
     id: cloudEvent.id,
     data: data,
-    subject: firestoreReceived.value.name,
-    collectionPath: collectionPath,
-    type: eventType,
-  };
-
-  return {
-    id: cloudEvent.id,
-    data: eventType === "delete" ? firestoreReceived.oldValue : firestoreReceived.value,
-    subject: firestoreReceived.value.name,
+    subject: subject,
     collectionPath: collectionPath,
     type: eventType,
   };
 };
 
-const getEventType = (eventType: string) => {
-  switch (eventType) {
-    case "google.cloud.firestore.document.v1.created":
-      return "create";
-    case "google.cloud.firestore.document.v1.updated":
-      return "update";
-    case "google.cloud.firestore.document.v1.deleted":
-      return "delete";
-    case "google.cloud.firestore.document.v1.written":
-      return "written";
-    default:
-      throw new Error(`Unknown event type: ${eventType}`);
-  }
+const getEventType = (firestoreReceived: Record<string, object>): EventType => {
+  const isCreate = isEmptyObject(firestoreReceived.oldValue);
+  const isDelete = isEmptyObject(firestoreReceived.value);
+
+  if (isCreate) return EventType.CREATE;
+  if (isDelete) return EventType.DELETE;
+  return EventType.UPDATE;
+};
+
+const isEmptyObject = (obj: object): boolean => {
+  return Object.keys(obj).length == 0;
+};
+
+const createCollectionPath = (path: string): string => {
+  const collectionHierarchy = path
+    .split("/")
+    .filter((_, index) => index % 2 == 0)
+    .join(":");
+
+  return collectionHierarchy;
 };

@@ -8,7 +8,7 @@ import {
   setUpSubscription,
   tearDownPubSub,
   waitForMessage,
-} from "./pubsub";
+} from "./test-support/pubsub";
 import { Subscription } from "@google-cloud/pubsub";
 import { USER_STREAM } from "../config";
 import path from "path";
@@ -67,7 +67,7 @@ describe("dataWritten", async () => {
       description: "some new data",
     };
 
-    await dataStream.userWritten(cloudEvent);
+    await dataStream.userWrittenHandler(cloudEvent);
 
     await waitForMessage(userFirestoreSubscription.messages);
     expect(userFirestoreSubscription.messages).toHaveLength(1);

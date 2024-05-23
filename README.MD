@@ -1,6 +1,6 @@
 ### Description
 
-In this project, we are publishing `user-written` topic with the following message when on `onDocumentWritten` event is triggered
+In this project, we are publishing a `UsersDocumentWritten` message to the `user-written` topic. The message is triggered on the `onDocumentWritten` Firestore event
 
 ![alt text](https://github.com/paulbraganza12/cloud-firestore-triggers/assets/25667662/935b8ac7-73fc-4af6-b1f5-85d83854c6a8)
 
@@ -54,35 +54,34 @@ Example:
 - Node
 - [Google Cloud Event](https://cloud.google.com/functions/docs/calling/cloud-firestore#functions_cloudevent_firebase_firestore-nodejs)
 - [PubSub](https://cloud.google.com/pubsub/docs/overview)
+- [Firestore Triggers](https://cloud.google.com/functions/docs/calling/cloud-firestore) using Cloud Functions 2nd gen
 
-### Setup
+## Getting Started
 
-1. Set up env vars for local environment:
+### Pre-Requisites
 
-```
-cp .env.example .env
-```
+- [nvm](https://github.com/nvm-sh/nvm) (or another Node.js version manager)
+- A `.env` file
 
-2. Install NodeJS18
+### Create a `.env` file
 
-```
+Copy the `.env.example` from this directory and save it as `.env`.
+
+### Installing
+
+```bash
 nvm use
-```
-
-### Install App
-
-```
-npm i
+npm install
 ```
 
 ### Run Docker from the root before testing
 
-```
+```bash
 docker-compose up emulator
 ```
 
 ### Run Vitest
 
-```
+```bash
 npm run test
 ```

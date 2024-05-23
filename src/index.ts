@@ -3,9 +3,9 @@ import * as userFirestoreTopic from "./pubsub/user-firestore";
 import { PubSub } from "@google-cloud/pubsub";
 import { parseEventData } from "./utils/parse-event-data";
 
-const pubsub: PubSub = new PubSub({ projectId: process.env.FIREBASE_PROJECT_ID });
+const pubsub: PubSub = new PubSub({ projectId: process.env.GCLOUD_PROJECT });
 
-export const userWritten = async (
+export const userWrittenHandler = async (
   cloudEvent: functions.CloudEvent<protobuf.Reader | Uint8Array>,
 ) => {
   try {
@@ -17,4 +17,4 @@ export const userWritten = async (
   }
 };
 
-functions.cloudEvent("userWritten", userWritten);
+functions.cloudEvent("userWritten", userWrittenHandler);

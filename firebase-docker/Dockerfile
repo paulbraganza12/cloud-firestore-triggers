@@ -11,4 +11,4 @@ WORKDIR /firebase
 
 COPY . .
 
-CMD firebase emulators:start --project=${FIREBASE_PROJECT_ID} --only=${EMULATORS_USED} 
+CMD firebase emulators:start --project=${GCLOUD_PROJECT} --only=${EMULATORS_USED} 

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PubSub, Subscription } from "@google-cloud/pubsub";
-import { USER_STREAM } from "../config";
+import { USER_STREAM } from "../../config";
 import { retry } from "ts-retry-promise";
-
-const pubsub = new PubSub({ projectId: process.env.FIREBASE_PROJECT_ID });
+import { loadConfigIntoEnvironment } from "./configuration";
 
 let subscriptions: Subscription[] = [];
 
@@ -12,8 +11,10 @@ export const createRequiredTopics = async () => {
 };
 
 export const createTopic = async (topicName: string) => {
+  const env = loadConfigIntoEnvironment();
   const pubsub = new PubSub({
-    projectId: process.env.FIREBASE_PROJECT_ID,
+    projectId: env.GCLOUD_PROJECT,
+    apiEndpoint: env.PUBSUB_EMULATOR_HOST,
   });
 
   const topic = pubsub.topic(topicName);
@@ -24,6 +25,12 @@ export const createTopic = async (topicName: string) => {
 };
 
 export const tearDownPubSub = async (): Promise<void> => {
+  const env = loadConfigIntoEnvironment();
+  const pubsub = new PubSub({
+    projectId: env.GCLOUD_PROJECT,
+    apiEndpoint: env.PUBSUB_EMULATOR_HOST,
+  });
+
   const topics = await pubsub.getTopics();
   for (const subscription of subscriptions) {
     await subscription.delete();
@@ -45,6 +52,12 @@ export const setUpSubscription = async (
   messages: CapturedMessage[];
   subscription: Subscription;
 }> => {
+  const env = loadConfigIntoEnvironment();
+  const pubsub = new PubSub({
+    projectId: env.GCLOUD_PROJECT,
+    apiEndpoint: env.PUBSUB_EMULATOR_HOST,
+  });
+
   const existingSubscriptions = subscriptions.filter((sub) => {
     return sub.name.includes(topic);
   });

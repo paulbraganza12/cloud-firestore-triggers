@@ -13,7 +13,7 @@ type FirestoreValue = {
   stringValue?: string;
   referenceValue?: string;
   geoPointValue?: LatLng;
-  arrayValue: { values: { [key: string]: unknown }[] };
+  arrayValue: { values: FirestoreValue[] };
   mapValue?: { fields: { [key: string]: FirestoreValue } };
 };
 
@@ -58,7 +58,7 @@ export const serializeData = (data: { [key: string]: unknown }): { [key: string]
       case value.arrayValue !== undefined:
         serializedData[key] = value.arrayValue.values.map((value) => {
           if (value.mapValue !== undefined && value.mapValue !== null)
-            return serializeData(value.mapValue as { [key: string]: unknown });
+            return serializeData(value.mapValue.fields);
           return serializeData(value);
         });
         break;

@@ -16,7 +16,7 @@ services:
       - 4000:4000 # ui
       - 8085:8085 # pubsub
     environment:
-      FIREBASE_PROJECT_ID: "test-project"
+      GCLOUD_PROJECT: "test-project"
       EMULATORS_USED: "pubsub,firestore,functions,storage,auth"
     volumes:
       - ./firebase-docker/cache:/root/.cache:rw

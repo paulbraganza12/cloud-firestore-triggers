@@ -26,7 +26,8 @@ export const parseEventData = async (
 
   const eventType = getEventType(firestoreReceived);
 
-  const value = eventType === "delete" ? firestoreReceived.oldValue : firestoreReceived.value;
+  const value =
+    eventType === EventType.DELETE ? firestoreReceived.oldValue : firestoreReceived.value;
   const collectionPath = createCollectionPath(value.name);
   const subject = value.name;
   const data = serializeData(value.fields);
@@ -42,9 +43,8 @@ export const parseEventData = async (
 
 const getEventType = (firestoreReceived: Record<string, object>): EventType => {
   const isCreate = isEmptyObject(firestoreReceived.oldValue);
-  const isDelete = isEmptyObject(firestoreReceived.value);
-
   if (isCreate) return EventType.CREATE;
+  const isDelete = isEmptyObject(firestoreReceived.value);
   if (isDelete) return EventType.DELETE;
   return EventType.UPDATE;
 };

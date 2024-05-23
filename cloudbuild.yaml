@@ -1,0 +1,34 @@
+substitutions:
+  _RUNTIME: nodejs18
+  _GCP_REGION: europe-west2
+  _TRIGGER_LOCATION: europe-west2
+  _NODE_VERSION: node:20.11.1
+
+options:
+  machineType: "E2_HIGHCPU_8"
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: "deploy-user-written"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    waitFor: ["run-build"]
+    args:
+      [
+        "gcloud",
+        "functions",
+        "deploy",
+        "firestore-user-written",
+        "--gen2",
+        "--runtime=$_RUNTIME",
+        "--region=$_GCP_REGION",
+        "--trigger-location=$_TRIGGER_LOCATION",
+        "--source=.",
+        "--entry-point=userWritten",
+        "--trigger-event-filters=type=google.cloud.firestore.document.v1.written",
+        "--trigger-event-filters=database=(default)",
+        "--trigger-event-filters-path-pattern=document=user/{userId}",
+        "--set-env-vars",
+        "GCLOUD_PROJECT=$_PROJECT_ID",
+      ]
+    dir: "cloud-firestore-triggers"

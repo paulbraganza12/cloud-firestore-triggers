@@ -24,7 +24,7 @@ describe("parseEventData", async () => {
     const DocumentEventData = root.lookupType("google.events.cloud.firestore.v1.DocumentEventData");
     const Document = root.lookupType("google.events.cloud.firestore.v1.Document");
     const data = DocumentEventData.create({
-      oldValue: {},
+      oldValue: null,
       value: Document.create({
         name: "users/123/feeds/1",
         fields: {
@@ -62,7 +62,7 @@ describe("parseEventData", async () => {
           title: { stringValue: "test" },
         },
       }),
-      value: {},
+      value: null,
     });
     const cloudEvent = new CloudEvent({
       source: "firebase",

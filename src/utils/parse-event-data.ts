@@ -42,15 +42,15 @@ export const parseEventData = async (
 };
 
 const getEventType = (firestoreReceived: Record<string, object>): EventType => {
-  const isCreate = isEmptyObject(firestoreReceived.oldValue);
+  const isCreate = isNullOrUndefined(firestoreReceived.oldValue);
   if (isCreate) return EventType.CREATE;
-  const isDelete = isEmptyObject(firestoreReceived.value);
+  const isDelete = isNullOrUndefined(firestoreReceived.value);
   if (isDelete) return EventType.DELETE;
   return EventType.UPDATE;
 };
 
-const isEmptyObject = (obj: object): boolean => {
-  return Object.keys(obj).length == 0;
+const isNullOrUndefined = (obj: object): boolean => {
+  return obj === null || obj === undefined;
 };
 
 const createCollectionPath = (path: string): string => {

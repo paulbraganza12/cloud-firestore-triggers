@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { serializeData } from "../utils/serialize-data";
+import { google } from "../../protos/compiledFirestore";
 
 describe("serializeData", () => {
   test("should return firestore json object representation of the event data", () => {
-    const eventData = {
+    const eventData: { [key: string]: google.events.cloud.firestore.v1.IValue } = {
       categoryIds: {
         arrayValue: {
           values: [{ stringValue: "1" }, { stringValue: "2" }],
@@ -16,10 +17,10 @@ describe("serializeData", () => {
         },
       },
       bytesData: {
-        bytesValue: "SGVsbG8gV29ybGQ=",
+        bytesValue: Buffer.from("SGVsbG8gV29ybGQ="),
       },
       intValue: {
-        integerValue: "50",
+        integerValue: 50,
       },
       isActive: { booleanValue: false },
       paused: { nullValue: null },
@@ -53,7 +54,7 @@ describe("serializeData", () => {
                     stringValue: "x",
                   },
                   {
-                    integerValue: "1",
+                    integerValue: 1,
                   },
                 ],
               },
@@ -68,8 +69,8 @@ describe("serializeData", () => {
         latitude: -90.0,
         longitude: -180.0,
       },
-      bytesData: "SGVsbG8gV29ybGQ=",
-      intValue: "50",
+      bytesData: Buffer.from("SGVsbG8gV29ybGQ="),
+      intValue: 50,
       isActive: false,
       paused: null,
       nestedMap: {
@@ -81,7 +82,7 @@ describe("serializeData", () => {
             value3: ["x", "1"],
           },
         },
-        field2: ["x", "1"],
+        field2: ["x", 1],
       },
     };
 

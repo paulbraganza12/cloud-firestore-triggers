@@ -3,6 +3,7 @@ import { load, Reader } from "protobufjs";
 import path from "path";
 import { serializeData } from "./serialize-data";
 import { EventType } from "../config";
+import { google } from "../../protos/compiledFirestore";
 
 export type ParsedEvent = {
   id: string;
@@ -17,20 +18,27 @@ const dataProtoPath = path.join(__dirname, "../data.proto");
 export const parseEventData = async (
   cloudEvent: CloudEvent<Reader | Uint8Array>,
 ): Promise<ParsedEvent> => {
-  const root = await load(dataProtoPath);
-  const DocumentEventData = root.lookupType("google.events.cloud.firestore.v1.DocumentEventData");
   if (cloudEvent.data === undefined) {
     throw new Error("cloud event data is not defined");
   }
-  const firestoreReceived = DocumentEventData.decode(cloudEvent.data).toJSON();
+
+  // DocumentEventData
+  const root = await load(dataProtoPath);
+  const DocumentEventDataType = root.lookupType(
+    "google.events.cloud.firestore.v1.DocumentEventData",
+  );
+
+  const firestoreReceived = DocumentEventDataType.decode(
+    cloudEvent.data,
+  ).toJSON() as google.events.cloud.firestore.v1.DocumentEventData;
 
   const eventType = getEventType(firestoreReceived);
 
-  const value =
-    eventType === EventType.DELETE ? firestoreReceived.oldValue : firestoreReceived.value;
-  const collectionPath = createCollectionPath(value.name);
-  const subject = value.name;
-  const data = serializeData(value.fields);
+  const value = (firestoreReceived.value ?? firestoreReceived.oldValue)!;
+
+  const subject = value.name!;
+  const collectionPath = createCollectionPath(subject);
+  const data = serializeData(value.fields!);
 
   return {
     id: cloudEvent.id,
@@ -41,15 +49,21 @@ export const parseEventData = async (
   };
 };
 
-const getEventType = (firestoreReceived: Record<string, object>): EventType => {
-  const isCreate = isNullOrUndefined(firestoreReceived.oldValue);
-  if (isCreate) return EventType.CREATE;
-  const isDelete = isNullOrUndefined(firestoreReceived.value);
-  if (isDelete) return EventType.DELETE;
+const getEventType = (
+  firestoreReceived: google.events.cloud.firestore.v1.DocumentEventData,
+): EventType => {
+  if (isNullOrUndefined(firestoreReceived.oldValue)) {
+    return EventType.CREATE;
+  }
+  if (isNullOrUndefined(firestoreReceived.value)) {
+    return EventType.DELETE;
+  }
   return EventType.UPDATE;
 };
 
-const isNullOrUndefined = (obj: object): boolean => {
+const isNullOrUndefined = (
+  obj: google.events.cloud.firestore.v1.IDocument | null | undefined,
+): boolean => {
   return obj === null || obj === undefined;
 };
 
